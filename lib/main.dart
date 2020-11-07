@@ -5,75 +5,70 @@ import 'dart:convert';
 
 void main() {
   runApp(
-    new MaterialApp(
-      home: HomePage(),
-    ),
+    MaterialApp(home: HomePage()),
   );
 }
 
 class HomePage extends StatefulWidget {
+  //final String username;{this.username}
+  HomePage();
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  Map data;
-  List userData;
+  List data;
+  List recData;
 
-  getUser() async {
-    http.Response response = await http.get('http://10.0.2.2:4000/api/users');
+  getRecaudaciones() async {
+    http.Response response = await http.get(
+        'https://sigapdev2-consultarecibos-back.herokuapp.com/recaudaciones/alumno/concepto/listar_codigos/ELIZALDE');
+    debugPrint(response.body);
     data = json.decode(response.body);
+    // print(data[0]['ape_paterno']);
+    data = jsonDecode(response.body);
+    // print(data);
     setState(() {
-      userData = data['users'];
+      recData = data;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    getUser();
+    getRecaudaciones();
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User List'),
+        title: Text('Lista de Programas'),
         backgroundColor: Colors.indigo[900],
       ),
       body: ListView.builder(
-        itemCount: userData == null ? 0 : userData.length,
+        itemCount: recData == null ? 0 : recData.length,
         itemBuilder: (BuildContext context, int index) {
           return Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
+            child: Column(
+              children: <Widget>[
+                ListTile(
+                  leading: Text("$index"),
+                  title: Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      '$index',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      "${recData[index]["nombre_programa"]}",
                     ),
                   ),
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(userData[index]['avatar']),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      '${userData[index]['firstName']} ${userData[index]['lastName']}',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      "${recData[index]["cod_alumno"]}",
+                      style: TextStyle(color: Colors.black.withOpacity(0.6)),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                ),
+              ],
             ),
           );
         },
